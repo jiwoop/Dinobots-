@@ -1,2 +1,2 @@
-# Dinobots-
-Programming repository for Robotathon 22'
+# Dinobots:)
+## Programming repository for Robotathon 22'
