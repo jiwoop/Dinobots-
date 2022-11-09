@@ -1,19 +1,4 @@
 
-/**
- * @file LineSensorExample.c
- * Authors: Dario Jimenez, Matthew Yu (matthewjkyu@gmail.com)
- * @brief Program that demonstrates a simple use of the QTR reflectance sensor.
- * @version 0.1
- * @date 2021-09-28
- * @copyright Copyright (c) 2021
- * @note
- * Modify the value of "__MAIN__" on line 16 to choose which program to run:
- *
- * __MAIN__ = 0: demonstrates initialization and manual triggering of a line sensor.
- * __MAIN__ = 1: demonstrates initialization and interrupt capability of a line sensor.
- *
- * Analog pins used: PE3, PE2, PE1, PE0, PD3, PD2, PD1, and PD0.
- */
 #define __MAIN__ 0
 
 /** General imports. */
@@ -83,13 +68,10 @@ int main(void) {
     ServoStop(servo2);
 
 
-
     /* Main loop: read line sensor and get boolean array, turn on LEDs depending
        on values from boolean array. */
     while(1) {
-
         /* Read from the line sensor. */
-
         LineSensorGetIntArray(&sensor);
 
         /* Here, you should check your debugger to see what is inside the sensor
@@ -105,26 +87,21 @@ int main(void) {
             avgSide += sensor.values[i] << i;
         }
 
-
         /* Turn on RED LED if sensor data is none across the board. */
         if (avgSide == 0) {
-
             GPIOSetBit(PIN_F1, 1);
             GPIOSetBit(PIN_F2, 0);
             GPIOSetBit(PIN_F3, 0);
+            DelayMillisec(150);
 
 
-            //ServoSetSpeed(servo2, 0);
-            //ServoSetSpeed(servo, 0);
+                                      ServoSetSpeed(servo, 20);
+                                      ServoSetSpeed(servo2, 30);
+                                      DelayMillisec(150);
+                                      ServoSetSpeed(servo, 30);
+                                      ServoSetSpeed(servo2, 20);
+                                      DelayMillisec(300);
 
-            //                      for(i = 0; i<100; i+=10){
-            //                          ServoSetSpeed(servo, -5);
-            //                          ServoSetSpeed(servo2, 20);
-            //                          DelayMillisec(100*i);
-            //                          ServoSetSpeed(servo, -20);
-            //                          ServoSetSpeed(servo2, 5);
-            //                          DelayMillisec(100*i);
-            //                      }
                                   //if you just need to give up
                                /* ServoSetSpeed(servo,  0);
                                  ServoSetSpeed(servo2, 0);*/
@@ -133,46 +110,58 @@ int main(void) {
             DelayMillisec(150);
         }
         /* Turn on GREEN LED if sensor data is tending towards the left side. */
-        else if (avgSide > 0x10) {
-
+        else if (avgSide >= 0x10) {
             GPIOSetBit(PIN_F1, 0);
             GPIOSetBit(PIN_F2, 0);
             GPIOSetBit(PIN_F3, 1);
-            ServoSetSpeed(servo2, 40);
-            ServoSetSpeed(servo, 25);
             DelayMillisec(150);
-            ServoStop(servo);
-            ServoStop(servo2);
-            DelayMillisec(100);
-            //                      for(i = 5; i<50; i+=5){
-            //                               ServoSetSpeed(servo, -5);
-            //                               ServoSetSpeed(servo2, 15+i);
-            //                               DelayMillisec(100);
-            //                        }
-            //*/
-            //
-;
+            if(avgSide==0x10)
+            {
+                            ServoSetSpeed(servo2, 30);
+                            ServoSetSpeed(servo, 30);
+                            DelayMillisec(100);
+                            ServoStop(servo);
+                            ServoStop(servo2);
+                            DelayMillisec(150);
 
+            }
+                      ServoSetSpeed(servo2, 25);
+                      ServoSetSpeed(servo, 40);
+                      DelayMillisec(100);
+                      ServoStop(servo);
+                      ServoStop(servo2);
+                      DelayMillisec(150);
+
+//            ServoSetSpeed(servo2, 40);
+//            ServoSetSpeed(servo, 25);
+//            DelayMillisec(150);
+//            ServoStop(servo);
+//            ServoStop(servo2);
+//            DelayMillisec(100);
+//                                  for(i = 5; i<50; i+=5){
+//                                           ServoSetSpeed(servo, 20);
+//                                           ServoSetSpeed(servo2, 20+i);
+//                                           DelayMillisec(140);
+//                                    }
+//
+//
+;
         }
         /* Turn on BLUE LED if sensor data is tending towards the right side. */
         else {
-
             GPIOSetBit(PIN_F1, 0);
             GPIOSetBit(PIN_F2, 1);
             GPIOSetBit(PIN_F3, 0);
+            DelayMillisec(150);
 
-            ServoSetSpeed(servo2, 25);
-           ServoSetSpeed(servo, 40);
-
+           ServoSetSpeed(servo2, 40);
+           ServoSetSpeed(servo, 25);
            DelayMillisec(150);
            ServoStop(servo);
            ServoStop(servo2);
            DelayMillisec(100);
 
-
         }
-        //DelayMillisec(150);
-
     }
 }
 
@@ -230,6 +219,39 @@ int main(void) {
     GPIOInit(PF1Config);
     GPIOInit(PF2Config);
     GPIOInit(PF3Config);
+
+
+    EnableInterrupts();
+
+    /* Main loop: read line sensor and get boolean array, turn on LEDs depending on values from boolean array */
+    while(1) {
+        uint8_t avgSide = 0;
+        uint8_t i;
+        for (i = 0; i < 8; ++i) {
+            avgSide += sensor.values[i] << i;
+        }
+
+        /* Turn on RED LED if sensor data is none across the board. */
+        if (avgSide == 0) {
+            GPIOSetBit(PIN_F1, 1);
+            GPIOSetBit(PIN_F2, 0);
+            GPIOSetBit(PIN_F3, 0);
+        }
+        /* Turn on GREEN LED if sensor data is tending towards the left side. */
+        else if (avgSide >= 0x10) {
+            GPIOSetBit(PIN_F1, 0);
+            GPIOSetBit(PIN_F2, 0);
+            GPIOSetBit(PIN_F3, 1);
+        }
+        /* Turn on BLUE LED if sensor data is tending towards the right side. */
+        else {
+            GPIOSetBit(PIN_F1, 0);
+            GPIOSetBit(PIN_F2, 1);
+            GPIOSetBit(PIN_F3, 0);
+        }
+    }
+}
+#endif
 
 
     EnableInterrupts();
