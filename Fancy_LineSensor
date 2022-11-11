@@ -118,8 +118,8 @@ int main(void) {
                                   //if you just need to give up
                                /* ServoSetSpeed(servo,  0);
                                  ServoSetSpeed(servo2, 0);*/
-                                                  ServoSetSpeed(servo, -30);
-                                                  ServoSetSpeed(servo2, -30);
+                                                  ServoSetSpeed(servo, -40);
+                                                  ServoSetSpeed(servo2, -40);
                                                   DelayMillisec(300);
 
             ServoStop(servo);
