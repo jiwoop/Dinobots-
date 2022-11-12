@@ -1,4 +1,3 @@
-/** General imports. */
 /** Device specific imports. */
 # include <stdlib.h>
 # include <stdio.h>
@@ -13,6 +12,8 @@
 # include <lib/ADC/ADC.h>
 # include <lib/UART/UART.h>
 # include <raslib/DistanceSensor/DistanceSensor.h>
+
+
 
 /**
  * These function declarations are defined in the startup.s assembly file for
@@ -53,6 +54,8 @@ int main(void) {
     GPIOConfig_t LED4 = {PIN_F4, GPIO_PULL_DOWN, true, 0, false, GPIO_DRIVE_2MA, false};
     GPIOInit(LED4);
 
+
+
     EnableInterrupts();
     PWM_t servo = ServoInit(M0_PB6);
     PWM_t servo2 = ServoInit(M0_PB7);
@@ -63,7 +66,6 @@ int main(void) {
     /* Main loop: read line sensor and get boolean array, turn on LEDs depending
        on values from boolean array. */
     while(1) {
-
         /* Read from the line sensor. */
         LineSensorGetIntArray(&sensor);
 
@@ -82,32 +84,22 @@ int main(void) {
             GPIOSetBit(PIN_F3, 0);
             DelayMillisec(150);
 
-            // Swerve a little
-            ServoSetSpeed(servo, 20);
-            ServoSetSpeed(servo2, 30);
-            DelayMillisec(150);
-            ServoSetSpeed(servo, 30);
-            ServoSetSpeed(servo2, 20);
-            DelayMillisec(150);
+           ServoSetSpeed(servo, -35);
+           ServoSetSpeed(servo2,-35);
+           DelayMillisec(300);
 
-            // Back up
-            ServoSetSpeed(servo, -20);
-            ServoSetSpeed(servo2, -20);
-            DelayMillisec(300);
 
             ServoStop(servo);
             ServoStop(servo2);
             DelayMillisec(150);
         }
-
         /* Turn on GREEN LED if sensor data is tending towards the left side. */
         else if (avgSide >= 0x10) {
             GPIOSetBit(PIN_F1, 0);
             GPIOSetBit(PIN_F2, 0);
             GPIOSetBit(PIN_F3, 1);
             DelayMillisec(150);
-
-            if(avgSide==0x10)
+            if(avgSide==0x18)
             {
                 ServoSetSpeed(servo2, 30);
                 ServoSetSpeed(servo, 30);
@@ -117,14 +109,14 @@ int main(void) {
                 DelayMillisec(150);
 
             }
-            ServoSetSpeed(servo2, 25);
-            ServoSetSpeed(servo, 40);
-            DelayMillisec(100);
-            ServoStop(servo);
-            ServoStop(servo2);
-            DelayMillisec(150);
-        }
+           ServoSetSpeed(servo2, 25);
+           ServoSetSpeed(servo, 45);
+           DelayMillisec(100);
+           ServoStop(servo);
+           ServoStop(servo2);
+           DelayMillisec(150);
 
+        }
         /* Turn on BLUE LED if sensor data is tending towards the right side. */
         else {
             GPIOSetBit(PIN_F1, 0);
@@ -132,12 +124,12 @@ int main(void) {
             GPIOSetBit(PIN_F3, 0);
             DelayMillisec(150);
 
-            ServoSetSpeed(servo2, 40);
-            ServoSetSpeed(servo, 25);
-            DelayMillisec(150);
-            ServoStop(servo);
-            ServoStop(servo2);
-            DelayMillisec(100);
+           ServoSetSpeed(servo2, 40);
+           ServoSetSpeed(servo, 25);
+           DelayMillisec(150);
+           ServoStop(servo);
+           ServoStop(servo2);
+           DelayMillisec(100);
 
         }
     }
